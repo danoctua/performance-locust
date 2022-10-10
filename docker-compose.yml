@@ -1,0 +1,18 @@
+x-locust: &locust
+  image: locustio/locust
+  env_file:
+    - .env
+  volumes:
+    - ./:/home/locust
+
+services:
+  # https://docs.locust.io/en/stable/running-distributed.html
+  master:
+    <<: *locust
+    ports:
+      - "8089:8089"
+    command: -f /home/locust/users --master -H http://master:8089 --class-picker
+
+  worker:
+    <<: *locust
+    command: -f /home/locust/users --worker --master-host master
